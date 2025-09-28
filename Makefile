@@ -1,7 +1,5 @@
 # Makefile - Sprint 1
 
-export DOMAINS_FILE ?= domains.txt
-export DNS_SERVER   ?= 8.8.8.8 
 OUT_DIR             := out
 DIST_DIR            := dist
 BATS_EXEC           := ./tests/bats/bin/bats
@@ -12,14 +10,12 @@ TOOLS               := dig awk grep sort
 
 
 help:
-	@echo "Uso: make [target]"
-	@echo ""
 	@echo "Targets disponibles:"
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-10s\033[0m %s\n", $$1, $$2}'
 
 
 tools: ## verifica que las dependencias esten instaladas
-	@echo "🔎 Verificando dependencias..."
+	@echo "Verificando dependencias..."
 	@for tool in $(TOOLS); do \
 		if ! command -v $$tool >/dev/null 2>&1; then \
 			echo " Error: La herramienta requerida '$$tool' no está instalada."; \
@@ -35,7 +31,8 @@ build: ## prepara los directorios de trabajo
 
 run: ## ejecuta el flujo principal del auditor DNS
 	@echo "Ejecutando auditoría (servidor DNS: $$DNS_SERVER, archivo: $$DOMAINS_FILE)"
-	@bash src/resolver.sh > $(OUT_DIR)/resolucion.csv
+	@bash src/consulta.sh
+	@bash src/actualizador-csv.sh
 	@echo " Resolución completada en $(OUT_DIR)/resolucion.csv"
 
 

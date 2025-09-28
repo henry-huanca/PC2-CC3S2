@@ -1,1 +1,6 @@
+# Artefactos
+out/
+dist/
+# Entorno local
+.env
 venv/
