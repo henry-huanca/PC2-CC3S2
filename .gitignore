@@ -4,3 +4,4 @@ dist/
 # Entorno local
 .env
 venv/
+
