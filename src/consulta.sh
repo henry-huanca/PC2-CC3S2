@@ -12,6 +12,11 @@ error(){
     rm -rf "${DIRECTORIO_SALIDA}"
     exit 10
 }
+error_dominio() {
+    echo "El dominio $d no existe"
+    rm -rf "${DIRECTORIO_SALIDA}"
+    exit 15
+}
 # Funcion para extraer el dominio_raiz
 get_dominio_raiz() {
     # Lista de TLDs compuestos comunes
@@ -38,7 +43,7 @@ for d in "${DOMAINS_ARR[@]}"; do
     ts=$(date -u +%FT%TZ) # Timestamp
     dominio_raiz=$(get_dominio_raiz $d)
     NS_SERVER=$(dig @"$DNS_SERVER" "$dominio_raiz" NS +short | head -n1 | sed 's/\.$//') # Servidor autoritativo
-    dig "@${NS_SERVER}" "${d}" +norecurse > "${DIRECTORIO_SALIDA}/salida_dig$i.txt" # Consulta a servidor autoritativo
+    dig "@${NS_SERVER}" "${d}" +norecurse > "${DIRECTORIO_SALIDA}/salida_dig$i.txt" || error_dominio # Consulta a servidor autoritativo
     echo $ts >> "${DIRECTORIO_SALIDA}/salida_dig$i.txt"
     ((i+=1))
 done
