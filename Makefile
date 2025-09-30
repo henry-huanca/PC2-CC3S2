@@ -1,13 +1,19 @@
-# Makefile - Sprint 1
+# Makefile - Sprint 2
 
 OUT_DIR             := out
-DIST_DIR            := dist
+RAW_DIR         	:= $(OUT_DIR)/raw
+CSV_DIR         	:= $(OUT_DIR)/csv
+FINAL_CSV       	:= $(CSV_DIR)/resolucion.csv
 BATS_EXEC           := ./tests/bats/bin/bats
 TOOLS               := dig awk grep sort
 
-# Evita conflictos con nombres de archivos
-.PHONY: help tools build run test clean
+CONSULTA_FLAG   := $(RAW_DIR)/.consulta
 
+
+
+# Evita conflictos con nombres de archivos
+.PHONY: help tools build run test clean rgr red green refactor
+all: $(FINAL_CSV)
 
 help:
 	@echo "Targets disponibles:"
@@ -27,13 +33,18 @@ tools: ## verifica que las dependencias esten instaladas
 
 build: ## prepara los directorios de trabajo
 	@echo " Creando directorios de salida..."
-	@mkdir -p $(OUT_DIR) $(DIST_DIR)
+	@mkdir -p $(RAW_DIR) $(CSV_DIR)
 
-run: ## ejecuta el flujo principal del auditor DNS
-	@echo "Ejecutando auditoría (servidor DNS: $$DNS_SERVER, archivo: $$DOMAINS_FILE)"
-	@bash src/consulta.sh
+run: $(FINAL_CSV)
+$(FINAL_CSV): $(CONSULTA_FLAG) src/actualizador-csv.sh
+	@echo "generando csv final"
 	@bash src/actualizador-csv.sh
-	@echo " Resolución completada en $(OUT_DIR)/resolucion.csv"
+	@echo "archivo csv actualizado"
+$(CONSULTA_FLAG): src/consulta.sh
+	@echo "ejecutando consultas DNS"
+	@rm -f $(RAW_DIR)/*
+	@bash src/consulta.sh
+	@touch $(CONSULTA_FLAG)
 
 
 test: ## Ejecuta la pruebas bats de forma reproducible
@@ -44,3 +55,16 @@ test: ## Ejecuta la pruebas bats de forma reproducible
 clean: ## Elimina los archivos y directorios generados
 	@echo "Limpiando archivos generados..."
 	@rm -rf $(OUT_DIR) $(DIST_DIR)
+
+red: ## asegurar que falle el test
+	@if $(BATS_EXEC) tests/*.bats; then\
+		echo "Todas las pruebas estan en verde, escribe primero una prueba que falle RED "; exit 1; \
+	else \
+		echo  "Estas en RED, implementa para pasar, luego haz VERDE"; \
+	fi
+
+green: ## ejecuta los test hasta que pasen	
+	@$(BATS_EXEC) tests/*.bats && echo "refactoriza de manera segura"
+
+refactor: ##ejecutar test tras refactor
+	@$(BATS_EXEC) tests/*.bats && echo "despues de refactorizar las pruebas siguen en verde"
