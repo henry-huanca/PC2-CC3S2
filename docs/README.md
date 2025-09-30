@@ -45,7 +45,7 @@ find tests/bats -type f -exec dos2unix {} +
 
 2.  **Ejecutar la Auditoría:**
     ```bash
-    make run
+    DOMAINS="google.com,uni.edu.pe" DNS_SERVER=1.1.1.1 make run
     ```
     Los resultados se generan en `out/resolucion.csv`.
 
@@ -61,6 +61,26 @@ find tests/bats -type f -exec dos2unix {} +
     ```bash
     make clean
     ```
+
+## Metodologia AAA/RGR
+
+1. **Probar prueba que falla**
+    ```bash
+    make red
+    ```
+2. **Probar que todas las pruebas estan en verde en red**
+```bash
+    DOMAINS="google.com,uni.edu.pe" DNS_SERVER=1.1.1.1 make red
+
+ ```
+3. **Probar que todas las pruebas estan en verde**
+```bash
+    DOMAINS="google.com,uni.edu.pe" DNS_SERVER=1.1.1.1 make green
+```
+4. **Probar prueba despues de limpiar**
+```bash
+    DOMAINS="google.com,uni.edu.pe" DNS_SERVER=1.1.1.1 make refactor
+```
 ## Configuración (Variables de Entorno)
 
 La configuración se gestiona exclusivamente a través de variables de entorno, siguiendo el principio III de 12-Factor.
@@ -68,14 +88,8 @@ La configuración se gestiona exclusivamente a través de variables de entorno, 
 | Variable       | Efecto Observable                                          | Valor por Defecto |
 |----------------|------------------------------------------------------------|-------------------|
 | `DNS_SERVER`   | Servidor DNS a utilizar para las consultas (`dig,grep,awk,sort`).   | (System default)  |
-| `DOMAINS_FILE` | Ruta al archivo con la lista de dominios a auditar.        | `domains.txt`     |
+| `DOMAINS` | Ruta al archivo con la lista de dominios a auditar.        |Lista de dominios separadas por comas     |
 
 
 ### Ejemplos de Ejecución
 
-* **Usar un DNS y un archivo de dominios personalizado:**
-    ```bash
-    export DNS_SERVER=8.8.8.8
-    export DOMAINS_FILE=domains.txt
-    make run
-    ```

@@ -1,6 +1,5 @@
 # Makefile - Sprint 2
 
-
 OUT_DIR             := out
 RAW_DIR         	:= $(OUT_DIR)/raw
 CSV_DIR         	:= $(OUT_DIR)/csv
@@ -8,7 +7,7 @@ FINAL_CSV       	:= $(CSV_DIR)/resolucion.csv
 BATS_EXEC           := ./tests/bats/bin/bats
 TOOLS               := dig awk grep sort
 
-CONSULTA_FLAG   := $(RAW_DIR)/.consulta_ok
+CONSULTA_FLAG   := $(RAW_DIR)/.consulta
 
 
 
@@ -38,12 +37,14 @@ build: ## prepara los directorios de trabajo
 
 run: $(FINAL_CSV)
 $(FINAL_CSV): $(CONSULTA_FLAG) src/actualizador-csv.sh
+	@echo "generando csv final"
 	@bash src/actualizador-csv.sh
+	@echo "archivo csv actualizado"
 $(CONSULTA_FLAG): src/consulta.sh
+	@echo "ejecutando consultas DNS"
 	@rm -f $(RAW_DIR)/*
 	@bash src/consulta.sh
 	@touch $(CONSULTA_FLAG)
-
 
 
 test: ## Ejecuta la pruebas bats de forma reproducible
