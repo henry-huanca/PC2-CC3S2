@@ -10,7 +10,7 @@ mkdir -p "${DIRECTORIO_SALIDA}"
 error(){
     echo "Ha ocurrido un error en src/actualiza-csv.sh"
     rm -rf "${DIRECTORIO_SALIDA}"
-    exit 1
+    exit 20
 }
 if [[ ! -f "${DIRECTORIO_SALIDA}/resolucion.csv" ]]; then # Si el archivo no existe
     # Crear archivo y agregar cabecera
