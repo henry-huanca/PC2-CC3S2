@@ -92,7 +92,7 @@ pack: clean
 
 	@echo "empaquetando el proyecto"
 	@mkdir -p dist/
-	@tar -czvf dist/auditor-dns-v1.0.0.tar.gz src/ docs/ tests/ Makefile
+	@tar --sort=name --mtime='@0' --owner=0 --group=0 --numeric-owner -czvf dist/auditor-dns-v1.0.0.tar.gz src/ docs/ tests/ Makefile
 
 red: ## asegurar que falle el test
 	@if $(BATS_EXEC) tests/*.bats; then\
