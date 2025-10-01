@@ -8,8 +8,7 @@ BATS_EXEC           := ./tests/bats/bin/bats
 TOOLS               := dig awk grep sort
 
 CONSULTA_FLAG   := $(RAW_DIR)/.consulta
-
-
+COMPARAR_SCRIPT := src/comparar-historicos.sh
 
 # Evita conflictos con nombres de archivos
 .PHONY: help tools build run test clean rgr red green refactor
@@ -47,6 +46,38 @@ $(CONSULTA_FLAG): src/consulta.sh
 	@touch $(CONSULTA_FLAG)
 
 
+validar: $(FINAL_CSV)
+	@echo "valida cabecera del csv"
+	@bash src/validar-csv.sh $(FINAL_CSV)
+
+snapshot: tools
+	@timestamp=$$(src/sello-tiempo.sh); \
+	echo "se creo un snapshot en timestamp"; \
+	snapshot_dir=$(OUT_DIR)/$$timestamp; \
+	mkdir -p $$snapshot_dir/csv $$snapshot_dir/raw; \
+	echo "consultar dominios"; \
+	DOMAINS=$(DOMAINS) DNS_SERVER=$(DNS_SERVER); \
+	src/consulta_snapshot.sh $$snapshot_dir; \
+	echo "generar archivo csv"; \
+	src/actualizador-csv-snapshot.sh $$snapshot_dir; \
+	echo "validar csv"; \
+	src/validar-csv.sh $$snapshot_dir/csv/resolucion.csv; \
+	echo "snapshot completado"
+
+compare:
+	@echo "comparar los snapshots"
+	@if [ $$(ls -1q $(OUT_DIR) | wc -l) -lt 2 ]; then \
+		echo "se necesita por lo menos 2 snapshot"; \
+	fi
+
+	@latest=$$(ls -1 $(OUT_DIR) | tail -n 1); \
+	previous=$$(ls -1 $(OUT_DIR) | tail -n 2 | head -n 1); \
+	echo "Anterior: $$previous"; \
+	echo "actual: $$latest"; \
+	src/comparar-historicos.sh $(OUT_DIR)/$$previous/csv $(OUT_DIR)/$$latest/csv
+
+
+
 test: ## Ejecuta la pruebas bats de forma reproducible
 	@echo " Ejecutando pruebas..."
 	@$(BATS_EXEC) tests/*.bats
@@ -55,6 +86,13 @@ test: ## Ejecuta la pruebas bats de forma reproducible
 clean: ## Elimina los archivos y directorios generados
 	@echo "Limpiando archivos generados..."
 	@rm -rf $(OUT_DIR) $(DIST_DIR)
+	@rm -rf dist/
+
+pack: clean
+
+	@echo "empaquetando el proyecto"
+	@mkdir -p dist/
+	@tar -czvf dist/auditor-dns-v1.0.0.tar.gz src/ docs/ tests/ Makefile
 
 red: ## asegurar que falle el test
 	@if $(BATS_EXEC) tests/*.bats; then\
