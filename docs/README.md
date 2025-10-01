@@ -81,6 +81,14 @@ find tests/bats -type f -exec dos2unix {} +
 ```bash
     DOMAINS="google.com,uni.edu.pe" DNS_SERVER=1.1.1.1 make refactor
 ```
+5. **Generar archivos csv en un determinado tiempo**
+```bash
+    DOMAINS="google.com,uni.edu.pe" DNS_SERVER=1.1.1.1 make snapshot
+```
+4. **Comparar csv originados a traves de make snapshot**
+```bash
+    make Compare
+```
 ## Configuración (Variables de Entorno)
 
 La configuración se gestiona exclusivamente a través de variables de entorno, siguiendo el principio III de 12-Factor.
@@ -89,7 +97,4 @@ La configuración se gestiona exclusivamente a través de variables de entorno, 
 |----------------|------------------------------------------------------------|-------------------|
 | `DNS_SERVER`   | Servidor DNS a utilizar para las consultas (`dig,grep,awk,sort`).   | (System default)  |
 | `DOMAINS` | Ruta al archivo con la lista de dominios a auditar.        |Lista de dominios separadas por comas     |
-
-
-### Ejemplos de Ejecución
 

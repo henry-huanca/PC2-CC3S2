@@ -1,6 +1,5 @@
 # Makefile - Sprint 2
-export DNS_SERVER ?= 8.8.8.8
-export DOMAINS=uni.edu.pe,youtube.com
+
 OUT_DIR             := out
 RAW_DIR         	:= $(OUT_DIR)/raw
 CSV_DIR         	:= $(OUT_DIR)/csv
@@ -58,9 +57,9 @@ snapshot: tools
 	mkdir -p $$snapshot_dir/csv $$snapshot_dir/raw; \
 	echo "consultar dominios"; \
 	DOMAINS=$(DOMAINS) DNS_SERVER=$(DNS_SERVER); \
-	src/consulta.sh $$snapshot_dir; \
+	src/consulta_snapshot.sh $$snapshot_dir; \
 	echo "generar archivo csv"; \
-	src/actualizador-csv.sh $$snapshot_dir; \
+	src/actualizador-csv-snapshot.sh $$snapshot_dir; \
 	echo "validar csv"; \
 	src/validar-csv.sh $$snapshot_dir/csv/resolucion.csv; \
 	echo "snapshot completado"
@@ -87,10 +86,12 @@ test: ## Ejecuta la pruebas bats de forma reproducible
 clean: ## Elimina los archivos y directorios generados
 	@echo "Limpiando archivos generados..."
 	@rm -rf $(OUT_DIR) $(DIST_DIR)
+	@rm -rf dist/
 
 pack: clean
 
 	@echo "empaquetando el proyecto"
+	@mkdir -p dist/
 	@tar -czvf dist/auditor-dns-v1.0.0.tar.gz src/ docs/ tests/ Makefile
 
 red: ## asegurar que falle el test

@@ -1,6 +1,6 @@
 # Bitácora – Sprint 1
 
-## 📌 Objetivos de este sprint
+##  Objetivos de este sprint
 
 - Implementar Makefile mínimo con targets básicos (`tools`, `build`, `run`, `test`, `clean`).
 - Escribir primera prueba Bats con metodología AAA/RGR.
@@ -8,7 +8,7 @@
 
 ---
 
-## 📌 Comandos ejecutados
+##  Comandos ejecutados
 
 ### 1. Verificación de dependencias
 
